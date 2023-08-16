@@ -4,10 +4,12 @@ package generatorexec
 
 // The standard sections included in every generated README.md
 type Readme struct {
-	// The title and overview (e.g. The Acme Python library ...)
+	// The title (e.g. Acme Python Library ...)
 	Title string `json:"title"`
 	// Badges rendered alongside the standard Fern badge
 	Badges string `json:"badges"`
+	// The summary included below the badges (e.g. The Acme Python library provides ...)
+	Summary string `json:"summary"`
 	// General requirements to use the SDK
 	Requirements *string `json:"requirements,omitempty"`
 	// The installation steps
