@@ -2,24 +2,133 @@
 
 package generatorexec
 
+import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
+)
+
+type BadgeType uint
+
+const (
+	BadgeTypeNpm BadgeType = iota + 1
+	BadgeTypeMaven
+	BadgeTypePypi
+	BadgeTypeGo
+)
+
+func (b BadgeType) String() string {
+	switch b {
+	default:
+		return strconv.Itoa(int(b))
+	case BadgeTypeNpm:
+		return "NPM"
+	case BadgeTypeMaven:
+		return "MAVEN"
+	case BadgeTypePypi:
+		return "PYPI"
+	case BadgeTypeGo:
+		return "GO"
+	}
+}
+
+func (b BadgeType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", b.String())), nil
+}
+
+func (b *BadgeType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "NPM":
+		value := BadgeTypeNpm
+		*b = value
+	case "MAVEN":
+		value := BadgeTypeMaven
+		*b = value
+	case "PYPI":
+		value := BadgeTypePypi
+		*b = value
+	case "GO":
+		value := BadgeTypeGo
+		*b = value
+	}
+	return nil
+}
+
 // The standard sections included in every generated README.md
-type Readme struct {
+//
+// # {{title}}
+// {{badge}} [Fern Badge]
+//
+// {{summary}}
+//
+// ## API Documentation
+//
+// API Reference Documentation is available {{here}}.
+//
+// ## Installation
+//
+// {{installation}}
+//
+// ## Usage
+//
+// {{usage}}
+//
+// ## Async Client
+//
+// {{asyncUsage}}
+//
+// ## Environments
+//
+// {{environments}}
+//
+// ## Custom URL
+//
+// {{customUrl}}
+//
+// ## Handling Errors
+//
+// {{errors}}
+//
+// ## Advanced: Setting Timeouts
+//
+// {{timeouts}}
+//
+// ## Advanced: Request Options
+//
+// {{requestOptions}}}
+//
+// ## Beta Status
+//
+// Some info about beta status.
+//
+// ## Contributing
+//
+// Some info about contributing.
+type GenerateReadmeRequest struct {
 	// The title (e.g. Acme Python Library ...)
 	Title string `json:"title"`
 	// Badges rendered alongside the standard Fern badge
-	Badges string `json:"badges"`
+	Badge *BadgeType `json:"badge,omitempty"`
 	// The summary included below the badges (e.g. The Acme Python library provides ...)
 	Summary string `json:"summary"`
-	// General requirements to use the SDK
-	Requirements *string `json:"requirements,omitempty"`
+	// Each requirement is rendered as a bulleted list
+	Requirements []string `json:"requirements,omitempty"`
 	// The installation steps
-	Installation string `json:"installation"`
-	// Describes how to instantiate the client (i.e. a code snippet)
-	Instantiation string `json:"instantiation"`
-	// Usage guide, extensible with Fern definition example annotations
+	Installation *string `json:"installation,omitempty"`
+	// Section describing how to instantiate the client (i.e. a code snippet)
 	Usage string `json:"usage"`
-	// The status of the SDK (e.g. beta)
-	Status string `json:"status"`
-	// The contributing guide; if not specified uses the default contributing notes
-	Contributing *string `json:"contributing,omitempty"`
+	// Section describing how to instantiate an async client
+	AsyncUsage *string `json:"asyncUsage,omitempty"`
+	// Section describing how to set timeouts
+	Timeouts *string `json:"timeouts,omitempty"`
+	// If multiple environments, a section for how to specify multiple environments
+	Environments *string `json:"environments,omitempty"`
+	// Section describing how to set a custom url
+	CustomUrl *string `json:"customUrl,omitempty"`
+	// Section describing how to set request options
+	RequestOptions *string `json:"requestOptions,omitempty"`
 }

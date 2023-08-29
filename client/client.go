@@ -5,11 +5,13 @@ package client
 import (
 	core "github.com/fern-api/generator-exec-go/core"
 	logging "github.com/fern-api/generator-exec-go/logging"
+	readme "github.com/fern-api/generator-exec-go/readme"
 	http "net/http"
 )
 
 type Client interface {
 	Logging() logging.Client
+	Readme() readme.Client
 }
 
 func NewClient(opts ...core.ClientOption) Client {
@@ -22,6 +24,7 @@ func NewClient(opts ...core.ClientOption) Client {
 		httpClient:    options.HTTPClient,
 		header:        options.ToHeader(),
 		loggingClient: logging.NewClient(opts...),
+		readmeClient:  readme.NewClient(opts...),
 	}
 }
 
@@ -30,8 +33,13 @@ type client struct {
 	httpClient    core.HTTPClient
 	header        http.Header
 	loggingClient logging.Client
+	readmeClient  readme.Client
 }
 
 func (c *client) Logging() logging.Client {
 	return c.loggingClient
+}
+
+func (c *client) Readme() readme.Client {
+	return c.readmeClient
 }
