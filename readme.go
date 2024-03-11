@@ -5,6 +5,7 @@ package generatorexec
 // The standard sections included in every generated README.md
 //
 // # {{title}}
+//
 // {{badge}} [Fern Badge]
 //
 // {{summary}}

@@ -1492,28 +1492,22 @@ type GoEndpointSnippet struct {
 	// A full endpoint snippet, including the client instantiation, e.g.
 	//
 	// import (
+	// "context"
+	// "fmt"
 	//
-	//	"context"
-	//	"fmt"
-	//
-	//	acme "github.com/acme/acme-go"
-	//	acmeclient "github.com/acme/acme-go/client"
-	//
+	// acme "github.com/acme/acme-go"
+	// acmeclient "github.com/acme/acme-go/client"
 	// )
 	//
 	// client := acmeclient.NewClient(
-	//
-	//	acmeclient.WithApiKey("..."),
-	//
+	// acmeclient.WithApiKey("..."),
 	// )
 	// client.Admin.Update(
-	//
-	//	context.TODO(),
-	//	"submission-12o3uds",
-	//	&acme.AdminUpdateRequest{
-	//	  SubmissionState: acme.RunningSubmissionStateQueuingSubmission,
-	//	},
-	//
+	// context.TODO(),
+	// "submission-12o3uds",
+	// &acme.AdminUpdateRequest{
+	// SubmissionState: acme.RunningSubmissionStateQueuingSubmission,
+	// },
 	// )
 	Client string `json:"client"`
 }
@@ -1525,16 +1519,14 @@ type JavaEndpointSnippet struct {
 	// import com.acme.resources.types.RunningSubmissionState;
 	//
 	// AcmeClient acmeClient = AcmeClient.builder()
-	//
-	//	.apiKey("...")
-	//	.build();
+	// .apiKey("...")
+	// .build();
 	//
 	// acmeClient.admin().create(
-	//
-	//	"submission-12o3uds",
-	//	AdminUpdateRequest.builder()
-	//	  .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
-	//	  .build());
+	// "submission-12o3uds",
+	// AdminUpdateRequest.builder()
+	// .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
+	// .build());
 	SyncClient string `json:"sync_client"`
 	// A full endpoint snippet, including the async client instantiation, e.g.
 	//
@@ -1542,16 +1534,14 @@ type JavaEndpointSnippet struct {
 	// import com.acme.resources.types.RunningSubmissionState;
 	//
 	// AcmeClient acmeClient = AcmeClient.builder()
-	//
-	//	.apiKey("API_KEY")
-	//	.build();
+	// .apiKey("API_KEY")
+	// .build();
 	//
 	// acmeClient.admin().create(
-	//
-	//	"submission-12o3uds",
-	//	AdminUpdateRequest.builder()
-	//	  .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
-	//	  .build());
+	// "submission-12o3uds",
+	// AdminUpdateRequest.builder()
+	// .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
+	// .build());
 	AsyncClient string `json:"async_client"`
 }
 
@@ -1563,10 +1553,8 @@ type PythonEndpointSnippet struct {
 	//
 	// client = Acme(api_key="...")
 	// client.admin.update(
-	//
-	//	submission_id="submission-12o3uds",
-	//	request=RunningSubmissionState.QUEUEING_SUBMISSION,
-	//
+	// submission_id="submission-12o3uds",
+	// request=RunningSubmissionState.QUEUEING_SUBMISSION,
 	// )
 	SyncClient string `json:"sync_client"`
 	// A full endpoint snippet, including the async client instantiation, e.g.
@@ -1576,10 +1564,8 @@ type PythonEndpointSnippet struct {
 	//
 	// client = AsyncAcme(api_key="...")
 	// await client.admin.update(
-	//
-	//	submission_id="submission-12o3uds",
-	//	request=RunningSubmissionState.QUEUEING_SUBMISSION,
-	//
+	// submission_id="submission-12o3uds",
+	// request=RunningSubmissionState.QUEUEING_SUBMISSION,
 	// )
 	AsyncClient string `json:"async_client"`
 }
@@ -1599,13 +1585,12 @@ type TypescriptEndpointSnippet struct {
 	//
 	// import { AcmeClient, Acme } from '@acme/acme-node-client';
 	//
-	//	const acme = new AcmeClient({
-	//	  apiKey: 'YOUR_API_KEY',
-	//	});
-	//
-	//	await acme.admin.update({
-	//	    submission_id: "submission-12o3uds",
-	//	    request: Acme.RunningSubmissionState.QUEUEING_SUBMISSION,
-	//	});
+	// const acme = new AcmeClient({
+	// apiKey: 'YOUR_API_KEY',
+	// });
+	// await acme.admin.update({
+	// submission_id: "submission-12o3uds",
+	// request: Acme.RunningSubmissionState.QUEUEING_SUBMISSION,
+	// });
 	Client string `json:"client"`
 }
