@@ -758,25 +758,40 @@ func (l *LicenseId) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type MavenCentralSignature struct {
+	KeyId     string `json:"keyId"`
+	Password  string `json:"password"`
+	SecretKey string `json:"secretKey"`
+}
+
+type MavenCentralSignatureGithubInfo struct {
+	KeyIdEnvironmentVariable     EnvironmentVariable `json:"keyIdEnvironmentVariable"`
+	PasswordEnvironmentVariable  EnvironmentVariable `json:"passwordEnvironmentVariable"`
+	SecretKeyEnvironmentVariable EnvironmentVariable `json:"secretKeyEnvironmentVariable"`
+}
+
 type MavenGithubPublishInfo struct {
-	RegistryUrl                 string              `json:"registryUrl"`
-	Coordinate                  string              `json:"coordinate"`
-	UsernameEnvironmentVariable EnvironmentVariable `json:"usernameEnvironmentVariable"`
-	PasswordEnvironmentVariable EnvironmentVariable `json:"passwordEnvironmentVariable"`
+	RegistryUrl                 string                           `json:"registryUrl"`
+	Coordinate                  string                           `json:"coordinate"`
+	UsernameEnvironmentVariable EnvironmentVariable              `json:"usernameEnvironmentVariable"`
+	PasswordEnvironmentVariable EnvironmentVariable              `json:"passwordEnvironmentVariable"`
+	Signature                   *MavenCentralSignatureGithubInfo `json:"signature,omitempty"`
 }
 
 type MavenRegistryConfig struct {
-	RegistryUrl string `json:"registryUrl"`
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	Group       string `json:"group"`
+	RegistryUrl string                 `json:"registryUrl"`
+	Username    string                 `json:"username"`
+	Password    string                 `json:"password"`
+	Group       string                 `json:"group"`
+	Signature   *MavenCentralSignature `json:"signature,omitempty"`
 }
 
 type MavenRegistryConfigV2 struct {
-	RegistryUrl string `json:"registryUrl"`
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	Coordinate  string `json:"coordinate"`
+	RegistryUrl string                 `json:"registryUrl"`
+	Username    string                 `json:"username"`
+	Password    string                 `json:"password"`
+	Coordinate  string                 `json:"coordinate"`
+	Signature   *MavenCentralSignature `json:"signature,omitempty"`
 }
 
 type NpmGithubPublishInfo struct {
