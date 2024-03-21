@@ -309,9 +309,10 @@ func (g *GeneratorEnvironment) Accept(visitor GeneratorEnvironmentVisitor) error
 }
 
 type GeneratorOutputConfig struct {
-	Path            string      `json:"path"`
-	SnippetFilepath *string     `json:"snippetFilepath,omitempty"`
-	Mode            *OutputMode `json:"mode,omitempty"`
+	Path               string              `json:"path"`
+	SnippetFilepath    *string             `json:"snippetFilepath,omitempty"`
+	PublishingMetadata *PublishingMetadata `json:"publishingMetadata,omitempty"`
+	Mode               *OutputMode         `json:"mode,omitempty"`
 }
 
 type GeneratorPublishConfig struct {
@@ -923,6 +924,13 @@ type PostmanConfig struct {
 type PostmanGithubPublishInfo struct {
 	ApiKeyEnvironmentVariable      EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
 	WorkspaceIdEnvironmentVariable EnvironmentVariable `json:"workspaceIdEnvironmentVariable"`
+}
+
+type PublishingMetadata struct {
+	PackageDescription *string `json:"package_description,omitempty"`
+	PublisherEmail     *string `json:"publisher_email,omitempty"`
+	ReferenceUrl       *string `json:"reference_url,omitempty"`
+	PublisherName      *string `json:"publisher_name,omitempty"`
 }
 
 type PypiGithubPublishInfo struct {
