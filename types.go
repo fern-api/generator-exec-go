@@ -1391,6 +1391,7 @@ type EndpointSnippet struct {
 	Python     *PythonEndpointSnippet
 	Java       *JavaEndpointSnippet
 	Go         *GoEndpointSnippet
+	Ruby       *RubyEndpointSnippet
 }
 
 func NewEndpointSnippetFromTypescript(value *TypescriptEndpointSnippet) *EndpointSnippet {
@@ -1407,6 +1408,10 @@ func NewEndpointSnippetFromJava(value *JavaEndpointSnippet) *EndpointSnippet {
 
 func NewEndpointSnippetFromGo(value *GoEndpointSnippet) *EndpointSnippet {
 	return &EndpointSnippet{Type: "go", Go: value}
+}
+
+func NewEndpointSnippetFromRuby(value *RubyEndpointSnippet) *EndpointSnippet {
+	return &EndpointSnippet{Type: "ruby", Ruby: value}
 }
 
 func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
@@ -1442,6 +1447,12 @@ func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		e.Go = value
+	case "ruby":
+		value := new(RubyEndpointSnippet)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		e.Ruby = value
 	}
 	return nil
 }
@@ -1486,6 +1497,15 @@ func (e EndpointSnippet) MarshalJSON() ([]byte, error) {
 			GoEndpointSnippet: e.Go,
 		}
 		return json.Marshal(marshaler)
+	case "ruby":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*RubyEndpointSnippet
+		}{
+			Type:                e.Type,
+			RubyEndpointSnippet: e.Ruby,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -1494,6 +1514,7 @@ type EndpointSnippetVisitor interface {
 	VisitPython(*PythonEndpointSnippet) error
 	VisitJava(*JavaEndpointSnippet) error
 	VisitGo(*GoEndpointSnippet) error
+	VisitRuby(*RubyEndpointSnippet) error
 }
 
 func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
@@ -1508,6 +1529,8 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 		return visitor.VisitJava(e.Java)
 	case "go":
 		return visitor.VisitGo(e.Go)
+	case "ruby":
+		return visitor.VisitRuby(e.Ruby)
 	}
 }
 
@@ -1591,6 +1614,21 @@ type PythonEndpointSnippet struct {
 	// request=RunningSubmissionState.QUEUEING_SUBMISSION,
 	// )
 	AsyncClient string `json:"async_client"`
+}
+
+type RubyEndpointSnippet struct {
+	// A full endpoint snippet, including the client instantiation, e.g.
+	//
+	// require "acme"
+	//
+	// acme = Acme::Client.new(
+	// apiKey: 'YOUR_API_KEY'
+	// )
+	// acme.admin.update(
+	// submission_id: "submission-12o3uds",
+	// request: Acme::RunningSubmissionState::QUEUEING_SUBMISSION
+	// )
+	Client string `json:"client"`
 }
 
 // The code snippets defined in the API
