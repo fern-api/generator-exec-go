@@ -310,10 +310,11 @@ func (g *GeneratorEnvironment) Accept(visitor GeneratorEnvironmentVisitor) error
 }
 
 type GeneratorOutputConfig struct {
-	Path               string              `json:"path"`
-	SnippetFilepath    *string             `json:"snippetFilepath,omitempty"`
-	PublishingMetadata *PublishingMetadata `json:"publishingMetadata,omitempty"`
-	Mode               *OutputMode         `json:"mode,omitempty"`
+	Path                    string              `json:"path"`
+	SnippetFilepath         *string             `json:"snippetFilepath,omitempty"`
+	SnippetTemplateFilepath *string             `json:"snippetTemplateFilepath,omitempty"`
+	PublishingMetadata      *PublishingMetadata `json:"publishingMetadata,omitempty"`
+	Mode                    *OutputMode         `json:"mode,omitempty"`
 }
 
 type GeneratorPublishConfig struct {
