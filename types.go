@@ -226,7 +226,7 @@ type GeneratorConfig struct {
 	Environment              *GeneratorEnvironment   `json:"environment,omitempty"`
 	Whitelabel               bool                    `json:"whitelabel"`
 	WriteUnitTests           bool                    `json:"writeUnitTests"`
-	GeneratePaginatedClients bool                    `json:"generatePaginatedClients"`
+	GeneratePaginatedClients *bool                   `json:"generatePaginatedClients,omitempty"`
 	GenerateOauthClients     bool                    `json:"generateOauthClients"`
 }
 
