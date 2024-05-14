@@ -219,14 +219,15 @@ type GeneratorConfig struct {
 	License    *LicenseConfig         `json:"license,omitempty"`
 	Output     *GeneratorOutputConfig `json:"output,omitempty"`
 	// Deprecated. Use output.mode instead.
-	Publish              *GeneratorPublishConfig `json:"publish,omitempty"`
-	WorkspaceName        string                  `json:"workspaceName"`
-	Organization         string                  `json:"organization"`
-	CustomConfig         any                     `json:"customConfig,omitempty"`
-	Environment          *GeneratorEnvironment   `json:"environment,omitempty"`
-	Whitelabel           bool                    `json:"whitelabel"`
-	WriteUnitTests       bool                    `json:"writeUnitTests"`
-	GenerateOauthClients bool                    `json:"generateOauthClients"`
+	Publish                  *GeneratorPublishConfig `json:"publish,omitempty"`
+	WorkspaceName            string                  `json:"workspaceName"`
+	Organization             string                  `json:"organization"`
+	CustomConfig             any                     `json:"customConfig,omitempty"`
+	Environment              *GeneratorEnvironment   `json:"environment,omitempty"`
+	Whitelabel               bool                    `json:"whitelabel"`
+	WriteUnitTests           bool                    `json:"writeUnitTests"`
+	GeneratePaginatedClients bool                    `json:"generatePaginatedClients"`
+	GenerateOauthClients     bool                    `json:"generateOauthClients"`
 }
 
 type GeneratorEnvironment struct {
