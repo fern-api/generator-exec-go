@@ -334,6 +334,7 @@ type GeneratorPublishTarget struct {
 	Pypi     *PypiRegistryConfig
 	Postman  *PostmanConfig
 	Rubygems *RubyGemsRegistryConfig
+	Nuget    *NugetRegistryConfig
 }
 
 func NewGeneratorPublishTargetFromMaven(value *MavenRegistryConfigV2) *GeneratorPublishTarget {
@@ -354,6 +355,10 @@ func NewGeneratorPublishTargetFromPostman(value *PostmanConfig) *GeneratorPublis
 
 func NewGeneratorPublishTargetFromRubygems(value *RubyGemsRegistryConfig) *GeneratorPublishTarget {
 	return &GeneratorPublishTarget{Type: "rubygems", Rubygems: value}
+}
+
+func NewGeneratorPublishTargetFromNuget(value *NugetRegistryConfig) *GeneratorPublishTarget {
+	return &GeneratorPublishTarget{Type: "nuget", Nuget: value}
 }
 
 func (g *GeneratorPublishTarget) UnmarshalJSON(data []byte) error {
@@ -395,6 +400,12 @@ func (g *GeneratorPublishTarget) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		g.Rubygems = value
+	case "nuget":
+		value := new(NugetRegistryConfig)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		g.Nuget = value
 	}
 	return nil
 }
@@ -448,6 +459,15 @@ func (g GeneratorPublishTarget) MarshalJSON() ([]byte, error) {
 			RubyGemsRegistryConfig: g.Rubygems,
 		}
 		return json.Marshal(marshaler)
+	case "nuget":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*NugetRegistryConfig
+		}{
+			Type:                g.Type,
+			NugetRegistryConfig: g.Nuget,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -457,6 +477,7 @@ type GeneratorPublishTargetVisitor interface {
 	VisitPypi(*PypiRegistryConfig) error
 	VisitPostman(*PostmanConfig) error
 	VisitRubygems(*RubyGemsRegistryConfig) error
+	VisitNuget(*NugetRegistryConfig) error
 }
 
 func (g *GeneratorPublishTarget) Accept(visitor GeneratorPublishTargetVisitor) error {
@@ -473,6 +494,8 @@ func (g *GeneratorPublishTarget) Accept(visitor GeneratorPublishTargetVisitor) e
 		return visitor.VisitPostman(g.Postman)
 	case "rubygems":
 		return visitor.VisitRubygems(g.Rubygems)
+	case "nuget":
+		return visitor.VisitNuget(g.Nuget)
 	}
 }
 
@@ -486,6 +509,7 @@ type GeneratorRegistriesConfigV2 struct {
 	Npm      *NpmRegistryConfigV2    `json:"npm,omitempty"`
 	Pypi     *PypiRegistryConfig     `json:"pypi,omitempty"`
 	Rubygems *RubyGemsRegistryConfig `json:"rubygems,omitempty"`
+	Nuget    *NugetRegistryConfig    `json:"nuget,omitempty"`
 }
 
 type GithubOutputMode struct {
@@ -502,6 +526,7 @@ type GithubPublishInfo struct {
 	Postman  *PostmanGithubPublishInfo
 	Pypi     *PypiGithubPublishInfo
 	Rubygems *RubyGemsGithubPublishInfo
+	Nuget    *NugetGithubPublishInfo
 }
 
 func NewGithubPublishInfoFromNpm(value *NpmGithubPublishInfo) *GithubPublishInfo {
@@ -522,6 +547,10 @@ func NewGithubPublishInfoFromPypi(value *PypiGithubPublishInfo) *GithubPublishIn
 
 func NewGithubPublishInfoFromRubygems(value *RubyGemsGithubPublishInfo) *GithubPublishInfo {
 	return &GithubPublishInfo{Type: "rubygems", Rubygems: value}
+}
+
+func NewGithubPublishInfoFromNuget(value *NugetGithubPublishInfo) *GithubPublishInfo {
+	return &GithubPublishInfo{Type: "nuget", Nuget: value}
 }
 
 func (g *GithubPublishInfo) UnmarshalJSON(data []byte) error {
@@ -563,6 +592,12 @@ func (g *GithubPublishInfo) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		g.Rubygems = value
+	case "nuget":
+		value := new(NugetGithubPublishInfo)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		g.Nuget = value
 	}
 	return nil
 }
@@ -616,6 +651,15 @@ func (g GithubPublishInfo) MarshalJSON() ([]byte, error) {
 			RubyGemsGithubPublishInfo: g.Rubygems,
 		}
 		return json.Marshal(marshaler)
+	case "nuget":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*NugetGithubPublishInfo
+		}{
+			Type:                   g.Type,
+			NugetGithubPublishInfo: g.Nuget,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -625,6 +669,7 @@ type GithubPublishInfoVisitor interface {
 	VisitPostman(*PostmanGithubPublishInfo) error
 	VisitPypi(*PypiGithubPublishInfo) error
 	VisitRubygems(*RubyGemsGithubPublishInfo) error
+	VisitNuget(*NugetGithubPublishInfo) error
 }
 
 func (g *GithubPublishInfo) Accept(visitor GithubPublishInfoVisitor) error {
@@ -641,6 +686,8 @@ func (g *GithubPublishInfo) Accept(visitor GithubPublishInfoVisitor) error {
 		return visitor.VisitPypi(g.Pypi)
 	case "rubygems":
 		return visitor.VisitRubygems(g.Rubygems)
+	case "nuget":
+		return visitor.VisitNuget(g.Nuget)
 	}
 }
 
@@ -813,6 +860,18 @@ type NpmRegistryConfig struct {
 type NpmRegistryConfigV2 struct {
 	RegistryUrl string `json:"registryUrl"`
 	Token       string `json:"token"`
+	PackageName string `json:"packageName"`
+}
+
+type NugetGithubPublishInfo struct {
+	RegistryUrl               string              `json:"registryUrl"`
+	PackageName               string              `json:"packageName"`
+	ApiKeyEnvironmentVariable EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
+}
+
+type NugetRegistryConfig struct {
+	RegistryUrl string `json:"registryUrl"`
+	ApiKey      string `json:"apiKey"`
 	PackageName string `json:"packageName"`
 }
 
@@ -1213,6 +1272,7 @@ const (
 	RegistryTypeMaven
 	RegistryTypePypi
 	RegistryTypeRubygems
+	RegistryTypeNuget
 )
 
 func (r RegistryType) String() string {
@@ -1227,6 +1287,8 @@ func (r RegistryType) String() string {
 		return "PYPI"
 	case RegistryTypeRubygems:
 		return "RUBYGEMS"
+	case RegistryTypeNuget:
+		return "NUGET"
 	}
 }
 
@@ -1252,6 +1314,9 @@ func (r *RegistryType) UnmarshalJSON(data []byte) error {
 	case "RUBYGEMS":
 		value := RegistryTypeRubygems
 		*r = value
+	case "NUGET":
+		value := RegistryTypeNuget
+		*r = value
 	}
 	return nil
 }
@@ -1270,6 +1335,7 @@ const (
 	BadgeTypePypi
 	BadgeTypeGo
 	BadgeTypeRubygems
+	BadgeTypeNuget
 )
 
 func (b BadgeType) String() string {
@@ -1286,6 +1352,8 @@ func (b BadgeType) String() string {
 		return "GO"
 	case BadgeTypeRubygems:
 		return "RUBYGEMS"
+	case BadgeTypeNuget:
+		return "NUGET"
 	}
 }
 
@@ -1313,6 +1381,9 @@ func (b *BadgeType) UnmarshalJSON(data []byte) error {
 		*b = value
 	case "RUBYGEMS":
 		value := BadgeTypeRubygems
+		*b = value
+	case "NUGET":
+		value := BadgeTypeNuget
 		*b = value
 	}
 	return nil
