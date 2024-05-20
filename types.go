@@ -310,6 +310,16 @@ func (g *GeneratorEnvironment) Accept(visitor GeneratorEnvironmentVisitor) error
 	}
 }
 
+type GeneratorMetadata struct {
+	Description *string                    `json:"description,omitempty"`
+	Authors     []*GeneratorMetadataAuthor `json:"authors,omitempty"`
+}
+
+type GeneratorMetadataAuthor struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type GeneratorOutputConfig struct {
 	Path                    string              `json:"path"`
 	SnippetFilepath         *string             `json:"snippetFilepath,omitempty"`
@@ -988,6 +998,7 @@ type PostmanGithubPublishInfo struct {
 	WorkspaceIdEnvironmentVariable EnvironmentVariable `json:"workspaceIdEnvironmentVariable"`
 }
 
+// This should effectively be deprecated in favor of a more specific configuration per-output mode (pypi, maven, etc.).
 type PublishingMetadata struct {
 	PackageDescription *string `json:"package_description,omitempty"`
 	PublisherEmail     *string `json:"publisher_email,omitempty"`
@@ -1000,13 +1011,23 @@ type PypiGithubPublishInfo struct {
 	PackageName                 string              `json:"packageName"`
 	UsernameEnvironmentVariable EnvironmentVariable `json:"usernameEnvironmentVariable"`
 	PasswordEnvironmentVariable EnvironmentVariable `json:"passwordEnvironmentVariable"`
+	PypiMetadata                *PypiMetadata       `json:"pypiMetadata,omitempty"`
+}
+
+type PypiMetadata struct {
+	Description       *string                    `json:"description,omitempty"`
+	Authors           []*GeneratorMetadataAuthor `json:"authors,omitempty"`
+	Keywords          []string                   `json:"keywords,omitempty"`
+	DocumentationLink *string                    `json:"documentationLink,omitempty"`
+	HomepageLink      *string                    `json:"homepageLink,omitempty"`
 }
 
 type PypiRegistryConfig struct {
-	RegistryUrl string `json:"registryUrl"`
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	PackageName string `json:"packageName"`
+	RegistryUrl  string        `json:"registryUrl"`
+	Username     string        `json:"username"`
+	Password     string        `json:"password"`
+	PackageName  string        `json:"packageName"`
+	PypiMetadata *PypiMetadata `json:"pypiMetadata,omitempty"`
 }
 
 type RemoteGeneratorEnvironment struct {
