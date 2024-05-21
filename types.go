@@ -310,16 +310,6 @@ func (g *GeneratorEnvironment) Accept(visitor GeneratorEnvironmentVisitor) error
 	}
 }
 
-type GeneratorMetadata struct {
-	Description *string                    `json:"description,omitempty"`
-	Authors     []*GeneratorMetadataAuthor `json:"authors,omitempty"`
-}
-
-type GeneratorMetadataAuthor struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 type GeneratorOutputConfig struct {
 	Path                    string              `json:"path"`
 	SnippetFilepath         *string             `json:"snippetFilepath,omitempty"`
@@ -885,6 +875,16 @@ type NugetRegistryConfig struct {
 	PackageName string `json:"packageName"`
 }
 
+type OutputMetadata struct {
+	Description *string                 `json:"description,omitempty"`
+	Authors     []*OutputMetadataAuthor `json:"authors,omitempty"`
+}
+
+type OutputMetadataAuthor struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type OutputMode struct {
 	Type          string
 	Publish       *GeneratorPublishConfig
@@ -1015,11 +1015,11 @@ type PypiGithubPublishInfo struct {
 }
 
 type PypiMetadata struct {
-	Description       *string                    `json:"description,omitempty"`
-	Authors           []*GeneratorMetadataAuthor `json:"authors,omitempty"`
-	Keywords          []string                   `json:"keywords,omitempty"`
-	DocumentationLink *string                    `json:"documentationLink,omitempty"`
-	HomepageLink      *string                    `json:"homepageLink,omitempty"`
+	Description       *string                 `json:"description,omitempty"`
+	Authors           []*OutputMetadataAuthor `json:"authors,omitempty"`
+	Keywords          []string                `json:"keywords,omitempty"`
+	DocumentationLink *string                 `json:"documentationLink,omitempty"`
+	HomepageLink      *string                 `json:"homepageLink,omitempty"`
 }
 
 type PypiRegistryConfig struct {
