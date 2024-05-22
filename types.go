@@ -1411,10 +1411,8 @@ func (b *BadgeType) UnmarshalJSON(data []byte) error {
 }
 
 type Endpoint struct {
-	// The id of the example used to create the snippet.
-	ExampleIdentifier *string             `json:"example_identifier,omitempty"`
-	Id                *EndpointIdentifier `json:"id,omitempty"`
-	Snippet           *EndpointSnippet    `json:"snippet,omitempty"`
+	Id      *EndpointIdentifier `json:"id,omitempty"`
+	Snippet *EndpointSnippet    `json:"snippet,omitempty"`
 }
 
 type EndpointIdentifier struct {
