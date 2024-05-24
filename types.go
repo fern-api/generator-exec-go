@@ -1644,8 +1644,8 @@ type Feature struct {
 type FeatureSnippet struct {
 	// The ID for the endpoint as declared within the IR, this is a unique name for the endpoint, whereas path and
 	// method are not (specifically for the fern definition, consider chat and chat stream).
-	EndpointId string `json:"endpoint_id"`
-	Snippet    string `json:"snippet"`
+	EndpointId string           `json:"endpoint_id"`
+	Snippet    *EndpointSnippet `json:"snippet,omitempty"`
 }
 
 // Describes all of the features currently supported by the Fern generators.
