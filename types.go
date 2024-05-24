@@ -1638,7 +1638,14 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 // A specific feature with a variety of endpoint examples. This also serves
 // the purpose of communicating which endpoints support a particular feature.
 type Feature struct {
-	Endpoints []*Endpoint `json:"endpoints,omitempty"`
+	Snippets []*FeatureSnippet `json:"snippets,omitempty"`
+}
+
+type FeatureSnippet struct {
+	// The ID for the endpoint as declared within the IR, this is a unique name for the endpoint, whereas path and
+	// method are not (specifically for the fern definition, consider chat and chat stream).
+	EndpointId string `json:"endpoint_id"`
+	Snippet    string `json:"snippet"`
 }
 
 // Describes all of the features currently supported by the Fern generators.
@@ -1756,10 +1763,8 @@ type Snippets struct {
 	// The type snippets defined by by the API
 	Types map[TypeId]string `json:"types,omitempty"`
 	// The endpoint snippets defined by the API
-	//
-	// Deprecated; use features.usage instead.
 	Endpoints []*Endpoint `json:"endpoints,omitempty"`
-	// A collection of snippets that demonstrate a particular feature
+	// A collection of snippets that demonstrate a particular feature.
 	Features *Features `json:"features,omitempty"`
 }
 
