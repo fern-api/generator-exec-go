@@ -1635,32 +1635,6 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 	}
 }
 
-// A specific feature with a variety of endpoint examples. This also serves
-// the purpose of communicating which endpoints support a particular feature.
-type Feature struct {
-	Snippets []*FeatureSnippet `json:"snippets,omitempty"`
-}
-
-type FeatureSnippet struct {
-	// The ID for the endpoint as declared within the IR, this is a unique name for the endpoint, whereas path and
-	// method are not (specifically for the fern definition, consider chat and chat stream).
-	EndpointId string           `json:"endpoint_id"`
-	Snippet    *EndpointSnippet `json:"snippet,omitempty"`
-}
-
-// Describes all of the features currently supported by the Fern generators.
-type Features struct {
-	Usage          *Feature `json:"usage,omitempty"`
-	Timeouts       *Feature `json:"timeouts,omitempty"`
-	RequestOptions *Feature `json:"requestOptions,omitempty"`
-	Retries        *Feature `json:"retries,omitempty"`
-	Errors         *Feature `json:"errors,omitempty"`
-	Streaming      *Feature `json:"streaming,omitempty"`
-	// Acts as a catch-all feature so that generators can communicate
-	// new features without requiring an API change.
-	Unknown map[string]*Feature `json:"unknown,omitempty"`
-}
-
 type GoEndpointSnippet struct {
 	// A full endpoint snippet, including the client instantiation, e.g.
 	//
@@ -1764,8 +1738,10 @@ type Snippets struct {
 	Types map[TypeId]string `json:"types,omitempty"`
 	// The endpoint snippets defined by the API
 	Endpoints []*Endpoint `json:"endpoints,omitempty"`
-	// A collection of snippets that demonstrate a particular feature.
-	Features *Features `json:"features,omitempty"`
+	// A collection of endpoint snippets that demonstrate a particular feature.
+	//
+	// For simplicity, this is just a simple map for now.
+	Features map[string][]*Endpoint `json:"features,omitempty"`
 }
 
 type TypeId = string
