@@ -214,10 +214,11 @@ type CustomLicense struct {
 type EnvironmentVariable = string
 
 type GeneratorConfig struct {
-	DryRun     bool                   `json:"dryRun"`
-	IrFilepath string                 `json:"irFilepath"`
-	License    *LicenseConfig         `json:"license,omitempty"`
-	Output     *GeneratorOutputConfig `json:"output,omitempty"`
+	DryRun                 bool                   `json:"dryRun"`
+	IrFilepath             string                 `json:"irFilepath"`
+	OriginalReadmeFilepath *string                `json:"originalReadmeFilepath,omitempty"`
+	License                *LicenseConfig         `json:"license,omitempty"`
+	Output                 *GeneratorOutputConfig `json:"output,omitempty"`
 	// Deprecated. Use output.mode instead.
 	Publish                  *GeneratorPublishConfig `json:"publish,omitempty"`
 	WorkspaceName            string                  `json:"workspaceName"`
@@ -311,9 +312,7 @@ func (g *GeneratorEnvironment) Accept(visitor GeneratorEnvironmentVisitor) error
 }
 
 type GeneratorOutputConfig struct {
-	Path string `json:"path"`
-	// A static file that defines the list of features supported by the generator.
-	FeaturesFilepath        *string             `json:"featuresFilepath,omitempty"`
+	Path                    string              `json:"path"`
 	SnippetFilepath         *string             `json:"snippetFilepath,omitempty"`
 	SnippetTemplateFilepath *string             `json:"snippetTemplateFilepath,omitempty"`
 	PublishingMetadata      *PublishingMetadata `json:"publishingMetadata,omitempty"`
@@ -1637,63 +1636,6 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 	}
 }
 
-// Unique identifiers for the different features that can be demonstrated in the snippets.
-type FeatureType uint
-
-const (
-	FeatureTypeUsage FeatureType = iota + 1
-	FeatureTypeTimeouts
-	FeatureTypeRequestOptions
-	FeatureTypeRetries
-	FeatureTypeErrors
-)
-
-func (f FeatureType) String() string {
-	switch f {
-	default:
-		return strconv.Itoa(int(f))
-	case FeatureTypeUsage:
-		return "USAGE"
-	case FeatureTypeTimeouts:
-		return "TIMEOUTS"
-	case FeatureTypeRequestOptions:
-		return "REQUEST_OPTIONS"
-	case FeatureTypeRetries:
-		return "RETRIES"
-	case FeatureTypeErrors:
-		return "ERRORS"
-	}
-}
-
-func (f FeatureType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", f.String())), nil
-}
-
-func (f *FeatureType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "USAGE":
-		value := FeatureTypeUsage
-		*f = value
-	case "TIMEOUTS":
-		value := FeatureTypeTimeouts
-		*f = value
-	case "REQUEST_OPTIONS":
-		value := FeatureTypeRequestOptions
-		*f = value
-	case "RETRIES":
-		value := FeatureTypeRetries
-		*f = value
-	case "ERRORS":
-		value := FeatureTypeErrors
-		*f = value
-	}
-	return nil
-}
-
 type GoEndpointSnippet struct {
 	// A full endpoint snippet, including the client instantiation, e.g.
 	//
@@ -1797,13 +1739,6 @@ type Snippets struct {
 	Types map[TypeId]string `json:"types,omitempty"`
 	// The endpoint snippets defined by the API
 	Endpoints []*Endpoint `json:"endpoints,omitempty"`
-	// A collection of endpoint snippets that demonstrate a particular feature.
-	//
-	// The key is a free-form string to allow for features not yet defined in the schema,
-	// but users are expected to use the FeatureType enum string representations.
-	Features map[string][]*Endpoint `json:"features,omitempty"`
-	// A list of requirements to use the generated snippets.
-	Requirements []string `json:"requirements,omitempty"`
 }
 
 type TypeId = string
