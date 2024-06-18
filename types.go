@@ -823,11 +823,12 @@ type MavenCentralSignatureGithubInfo struct {
 }
 
 type MavenGithubPublishInfo struct {
-	RegistryUrl                 string                           `json:"registryUrl"`
-	Coordinate                  string                           `json:"coordinate"`
-	UsernameEnvironmentVariable EnvironmentVariable              `json:"usernameEnvironmentVariable"`
-	PasswordEnvironmentVariable EnvironmentVariable              `json:"passwordEnvironmentVariable"`
-	Signature                   *MavenCentralSignatureGithubInfo `json:"signature,omitempty"`
+	RegistryUrl                   string                           `json:"registryUrl"`
+	Coordinate                    string                           `json:"coordinate"`
+	UsernameEnvironmentVariable   EnvironmentVariable              `json:"usernameEnvironmentVariable"`
+	PasswordEnvironmentVariable   EnvironmentVariable              `json:"passwordEnvironmentVariable"`
+	Signature                     *MavenCentralSignatureGithubInfo `json:"signature,omitempty"`
+	ShouldGeneratePublishWorkflow *bool                            `json:"shouldGeneratePublishWorkflow,omitempty"`
 }
 
 type MavenRegistryConfig struct {
@@ -847,9 +848,10 @@ type MavenRegistryConfigV2 struct {
 }
 
 type NpmGithubPublishInfo struct {
-	RegistryUrl              string              `json:"registryUrl"`
-	PackageName              string              `json:"packageName"`
-	TokenEnvironmentVariable EnvironmentVariable `json:"tokenEnvironmentVariable"`
+	RegistryUrl                   string              `json:"registryUrl"`
+	PackageName                   string              `json:"packageName"`
+	TokenEnvironmentVariable      EnvironmentVariable `json:"tokenEnvironmentVariable"`
+	ShouldGeneratePublishWorkflow *bool               `json:"shouldGeneratePublishWorkflow,omitempty"`
 }
 
 type NpmRegistryConfig struct {
@@ -865,9 +867,10 @@ type NpmRegistryConfigV2 struct {
 }
 
 type NugetGithubPublishInfo struct {
-	RegistryUrl               string              `json:"registryUrl"`
-	PackageName               string              `json:"packageName"`
-	ApiKeyEnvironmentVariable EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
+	RegistryUrl                   string              `json:"registryUrl"`
+	PackageName                   string              `json:"packageName"`
+	ApiKeyEnvironmentVariable     EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
+	ShouldGeneratePublishWorkflow *bool               `json:"shouldGeneratePublishWorkflow,omitempty"`
 }
 
 type NugetRegistryConfig struct {
@@ -1008,11 +1011,12 @@ type PublishingMetadata struct {
 }
 
 type PypiGithubPublishInfo struct {
-	RegistryUrl                 string              `json:"registryUrl"`
-	PackageName                 string              `json:"packageName"`
-	UsernameEnvironmentVariable EnvironmentVariable `json:"usernameEnvironmentVariable"`
-	PasswordEnvironmentVariable EnvironmentVariable `json:"passwordEnvironmentVariable"`
-	PypiMetadata                *PypiMetadata       `json:"pypiMetadata,omitempty"`
+	RegistryUrl                   string              `json:"registryUrl"`
+	PackageName                   string              `json:"packageName"`
+	UsernameEnvironmentVariable   EnvironmentVariable `json:"usernameEnvironmentVariable"`
+	PasswordEnvironmentVariable   EnvironmentVariable `json:"passwordEnvironmentVariable"`
+	PypiMetadata                  *PypiMetadata       `json:"pypiMetadata,omitempty"`
+	ShouldGeneratePublishWorkflow *bool               `json:"shouldGeneratePublishWorkflow,omitempty"`
 }
 
 type PypiMetadata struct {
@@ -1038,9 +1042,10 @@ type RemoteGeneratorEnvironment struct {
 }
 
 type RubyGemsGithubPublishInfo struct {
-	RegistryUrl               string              `json:"registryUrl"`
-	PackageName               string              `json:"packageName"`
-	ApiKeyEnvironmentVariable EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
+	RegistryUrl                   string              `json:"registryUrl"`
+	PackageName                   string              `json:"packageName"`
+	ApiKeyEnvironmentVariable     EnvironmentVariable `json:"apiKeyEnvironmentVariable"`
+	ShouldGeneratePublishWorkflow *bool               `json:"shouldGeneratePublishWorkflow,omitempty"`
 }
 
 type RubyGemsRegistryConfig struct {
