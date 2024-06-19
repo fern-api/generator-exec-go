@@ -516,8 +516,11 @@ type GeneratorRegistriesConfigV2 struct {
 type GithubOutputMode struct {
 	Version string `json:"version"`
 	// A full repo url (i.e. https://github.com/fern-api/fern)
-	RepoUrl     string             `json:"repoUrl"`
-	PublishInfo *GithubPublishInfo `json:"publishInfo,omitempty"`
+	RepoUrl string `json:"repoUrl"`
+	// The token scoped to installing the repository. If not specified, the generator
+	// should NOT attempt to clone the repository.
+	InstallationToken *string            `json:"installationToken,omitempty"`
+	PublishInfo       *GithubPublishInfo `json:"publishInfo,omitempty"`
 }
 
 type GithubPublishInfo struct {
