@@ -1,0 +1,4 @@
+name: generator-exec
+error-discrimination:
+  strategy: property
+  property-name: error

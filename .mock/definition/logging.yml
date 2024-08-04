@@ -1,0 +1,82 @@
+types:
+  TaskId: string
+  GeneratorUpdate:
+    union:
+      init: InitUpdate
+      initV2: InitUpdateV2
+      log: LogUpdate
+      publishing:
+        type: PackageCoordinate
+        key: publishing
+      published:
+        type: PackageCoordinate
+        key: published
+      exitStatusUpdate:
+        type: ExitStatusUpdate
+        key: exitStatusUpdate
+    discriminant:
+      name: type
+      value: _type
+  InitUpdate:
+    properties:
+      packagesToPublish: list<PackageCoordinate>
+  InitUpdateV2:
+    properties:
+      publishingToRegistry: optional<RegistryType>
+  RegistryType:
+    enum:
+      - NPM
+      - MAVEN
+      - PYPI
+      - RUBYGEMS
+      - NUGET
+  LogUpdate:
+    properties:
+      level: LogLevel
+      message: string
+  LogLevel:
+    enum:
+      - DEBUG
+      - INFO
+      - WARN
+      - ERROR
+  PackageCoordinate:
+    union:
+      npm: NpmCoordinate
+      maven: MavenCoordinate
+    discriminant:
+      name: type
+      value: _type
+  NpmCoordinate:
+    properties:
+      name: string
+      version: string
+  MavenCoordinate:
+    properties:
+      group: string
+      artifact: string
+      version: string
+  ExitStatusUpdate:
+    union:
+      successful: SuccessfulStatusUpdate
+      error: ErrorExitStatusUpdate
+    discriminant:
+      name: type
+      value: _type
+  SuccessfulStatusUpdate:
+    properties:
+      zipFilename: optional<string>
+  ErrorExitStatusUpdate:
+    properties:
+      message: string
+service:
+  auth: false
+  base-path: /api/generator-logging
+  endpoints:
+    sendUpdate:
+      path: /{taskId}
+      path-parameters:
+        taskId: TaskId
+      request:
+        body:
+          type: list<GeneratorUpdate>

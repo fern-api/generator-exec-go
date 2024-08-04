@@ -1,0 +1,46 @@
+imports:
+  config: config.yml
+types:
+  BackwardsCompatibleGeneratorConfig:
+    properties:
+      dryRun: boolean
+      irFilepath: string
+      output: BackwardsCompatibleGeneratorOutputConfig
+      publish:
+        type: optional<BackwardsCompatGeneratorPublishConfig>
+        docs: Deprecated. Use output.mode instead.
+      workspaceName: string
+      organization: string
+      customConfig: unknown
+      environment: config.GeneratorEnvironment
+  BackwardsCompatibleGeneratorOutputConfig:
+    properties:
+      path: string
+      mode: BackwardsCompatibleOutputMode
+  BackwardsCompatibleOutputMode:
+    union:
+      publish: BackwardsCompatGeneratorPublishConfig
+      downloadFiles: {}
+      github: config.GithubOutputMode
+  BackwardsCompatGeneratorPublishConfig:
+    docs: For the TS generators that use strict parsing.
+    properties:
+      registries:
+        type: config.GeneratorRegistriesConfig
+        docs: Deprecated, use publishTargets instead.
+      registriesV2:
+        type: BackwardsCompatibleRegistriesConfigV2
+        docs: Deprecated, use publishTargets instead.
+      publishTarget:
+        type: optional<BackwardsCompatiblePublishTarget>
+        docs: Must always be TS for TypeScript
+      version: string
+  BackwardsCompatibleRegistriesConfigV2:
+    docs: For the ts generators that are not backwards compatible.
+    properties:
+      maven: config.MavenRegistryConfigV2
+      npm: config.NpmRegistryConfigV2
+      pypi: config.PypiRegistryConfig
+  BackwardsCompatiblePublishTarget:
+    union:
+      npm: config.NpmRegistryConfigV2

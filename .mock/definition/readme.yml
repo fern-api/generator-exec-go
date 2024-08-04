@@ -1,0 +1,110 @@
+imports:
+  logging: logging.yml
+types:
+  GenerateReadmeRequest:
+    docs: |
+      The standard sections included in every generated README.md
+
+      # {{title}}
+      {{badge}} [Fern Badge]
+
+      {{summary}} 
+
+      ## API Documentation 
+
+      API Reference Documentation is available {{here}}. 
+
+      ## Installation 
+
+      {{installation}} 
+
+      ## Usage 
+
+      {{usage}}
+
+      ## Async Client
+
+      {{asyncUsage}}
+
+      ## Environments
+
+      {{environments}}
+
+      ## Custom URL
+
+      {{customUrl}}
+
+      ## Handling Errors
+
+      {{errors}}
+
+      ## Advanced: Setting Timeouts
+
+      {{timeouts}}
+
+      ## Advanced: Request Options
+
+      {{requestOptions}}}
+
+      ## Beta Status
+
+      Some info about beta status. 
+
+      ## Contributing
+
+      Some info about contributing.
+    properties:
+      title:
+        type: string
+        docs: The title (e.g. Acme Python Library ...)
+      badge:
+        type: optional<BadgeType>
+        docs: Badges rendered alongside the standard Fern badge
+      summary:
+        type: string
+        docs: >-
+          The summary included below the badges (e.g. The Acme Python library
+          provides ...)
+      requirements:
+        type: list<string>
+        docs: Each requirement is rendered as a bulleted list
+      installation:
+        type: optional<string>
+        docs: The installation steps
+      usage:
+        type: string
+        docs: Section describing how to instantiate the client (i.e. a code snippet)
+      asyncUsage:
+        type: optional<string>
+        docs: Section describing how to instantiate an async client
+      timeouts:
+        type: optional<string>
+        docs: Section describing how to set timeouts
+      environments:
+        type: optional<string>
+        docs: >-
+          If multiple environments, a section for how to specify multiple
+          environments
+      customUrl:
+        type: optional<string>
+        docs: Section describing how to set a custom url
+      requestOptions:
+        type: optional<string>
+        docs: Section describing how to set request options
+  BadgeType:
+    enum:
+      - NPM
+      - MAVEN
+      - PYPI
+      - GO
+      - RUBYGEMS
+      - NUGET
+service:
+  auth: false
+  base-path: /api/readme
+  endpoints:
+    generateReadme:
+      path: /{taskId}
+      path-parameters:
+        taskId: logging.TaskId
+      request: GenerateReadmeRequest
