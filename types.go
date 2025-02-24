@@ -1419,6 +1419,20 @@ func (b *BadgeType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type CsharpEndpointSnippet struct {
+	// A full endpoint snippet, including the client instantiation, e.g.
+	//
+	// using Acme;
+	//
+	// var acme = new AcmeClient("<YOUR_API_KEY>");
+	// await acme.Admin.Update(new UpdateAdminRequest
+	// {
+	// Id = "submission-12o3uds",
+	// SubmissionState = RunningSubmissionState.QueueingSubmission,
+	// });
+	Client string `json:"client"`
+}
+
 type Endpoint struct {
 	// The id of the example used to create the snippet.
 	ExampleIdentifier *string             `json:"example_identifier,omitempty"`
@@ -1502,6 +1516,7 @@ type EndpointSnippet struct {
 	Java       *JavaEndpointSnippet
 	Go         *GoEndpointSnippet
 	Ruby       *RubyEndpointSnippet
+	Csharp     *CsharpEndpointSnippet
 }
 
 func NewEndpointSnippetFromTypescript(value *TypescriptEndpointSnippet) *EndpointSnippet {
@@ -1522,6 +1537,10 @@ func NewEndpointSnippetFromGo(value *GoEndpointSnippet) *EndpointSnippet {
 
 func NewEndpointSnippetFromRuby(value *RubyEndpointSnippet) *EndpointSnippet {
 	return &EndpointSnippet{Type: "ruby", Ruby: value}
+}
+
+func NewEndpointSnippetFromCsharp(value *CsharpEndpointSnippet) *EndpointSnippet {
+	return &EndpointSnippet{Type: "csharp", Csharp: value}
 }
 
 func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
@@ -1563,6 +1582,12 @@ func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		e.Ruby = value
+	case "csharp":
+		value := new(CsharpEndpointSnippet)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		e.Csharp = value
 	}
 	return nil
 }
@@ -1616,6 +1641,15 @@ func (e EndpointSnippet) MarshalJSON() ([]byte, error) {
 			RubyEndpointSnippet: e.Ruby,
 		}
 		return json.Marshal(marshaler)
+	case "csharp":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*CsharpEndpointSnippet
+		}{
+			Type:                  e.Type,
+			CsharpEndpointSnippet: e.Csharp,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -1625,6 +1659,7 @@ type EndpointSnippetVisitor interface {
 	VisitJava(*JavaEndpointSnippet) error
 	VisitGo(*GoEndpointSnippet) error
 	VisitRuby(*RubyEndpointSnippet) error
+	VisitCsharp(*CsharpEndpointSnippet) error
 }
 
 func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
@@ -1641,6 +1676,8 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 		return visitor.VisitGo(e.Go)
 	case "ruby":
 		return visitor.VisitRuby(e.Ruby)
+	case "csharp":
+		return visitor.VisitCsharp(e.Csharp)
 	}
 }
 
