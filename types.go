@@ -1457,6 +1457,7 @@ const (
 	EndpointMethodGet
 	EndpointMethodPatch
 	EndpointMethodDelete
+	EndpointMethodHead
 )
 
 func (e EndpointMethod) String() string {
@@ -1473,6 +1474,8 @@ func (e EndpointMethod) String() string {
 		return "PATCH"
 	case EndpointMethodDelete:
 		return "DELETE"
+	case EndpointMethodHead:
+		return "HEAD"
 	}
 }
 
@@ -1500,6 +1503,9 @@ func (e *EndpointMethod) UnmarshalJSON(data []byte) error {
 		*e = value
 	case "DELETE":
 		value := EndpointMethodDelete
+		*e = value
+	case "HEAD":
+		value := EndpointMethodHead
 		*e = value
 	}
 	return nil
