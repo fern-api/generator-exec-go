@@ -207,6 +207,19 @@ type BasicLicense struct {
 	Id LicenseId `json:"id,omitempty"`
 }
 
+type CratesGithubPublishInfo struct {
+	RegistryUrl                   string              `json:"registryUrl"`
+	PackageName                   string              `json:"packageName"`
+	TokenEnvironmentVariable      EnvironmentVariable `json:"tokenEnvironmentVariable"`
+	ShouldGeneratePublishWorkflow *bool               `json:"shouldGeneratePublishWorkflow,omitempty"`
+}
+
+type CratesRegistryConfig struct {
+	RegistryUrl string `json:"registryUrl"`
+	Token       string `json:"token"`
+	PackageName string `json:"packageName"`
+}
+
 type CustomLicense struct {
 	Filename string `json:"filename"`
 }
@@ -336,6 +349,7 @@ type GeneratorPublishTarget struct {
 	Postman  *PostmanConfig
 	Rubygems *RubyGemsRegistryConfig
 	Nuget    *NugetRegistryConfig
+	Crates   *CratesRegistryConfig
 }
 
 func NewGeneratorPublishTargetFromMaven(value *MavenRegistryConfigV2) *GeneratorPublishTarget {
@@ -360,6 +374,10 @@ func NewGeneratorPublishTargetFromRubygems(value *RubyGemsRegistryConfig) *Gener
 
 func NewGeneratorPublishTargetFromNuget(value *NugetRegistryConfig) *GeneratorPublishTarget {
 	return &GeneratorPublishTarget{Type: "nuget", Nuget: value}
+}
+
+func NewGeneratorPublishTargetFromCrates(value *CratesRegistryConfig) *GeneratorPublishTarget {
+	return &GeneratorPublishTarget{Type: "crates", Crates: value}
 }
 
 func (g *GeneratorPublishTarget) UnmarshalJSON(data []byte) error {
@@ -407,6 +425,12 @@ func (g *GeneratorPublishTarget) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		g.Nuget = value
+	case "crates":
+		value := new(CratesRegistryConfig)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		g.Crates = value
 	}
 	return nil
 }
@@ -469,6 +493,15 @@ func (g GeneratorPublishTarget) MarshalJSON() ([]byte, error) {
 			NugetRegistryConfig: g.Nuget,
 		}
 		return json.Marshal(marshaler)
+	case "crates":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*CratesRegistryConfig
+		}{
+			Type:                 g.Type,
+			CratesRegistryConfig: g.Crates,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -479,6 +512,7 @@ type GeneratorPublishTargetVisitor interface {
 	VisitPostman(*PostmanConfig) error
 	VisitRubygems(*RubyGemsRegistryConfig) error
 	VisitNuget(*NugetRegistryConfig) error
+	VisitCrates(*CratesRegistryConfig) error
 }
 
 func (g *GeneratorPublishTarget) Accept(visitor GeneratorPublishTargetVisitor) error {
@@ -497,6 +531,8 @@ func (g *GeneratorPublishTarget) Accept(visitor GeneratorPublishTargetVisitor) e
 		return visitor.VisitRubygems(g.Rubygems)
 	case "nuget":
 		return visitor.VisitNuget(g.Nuget)
+	case "crates":
+		return visitor.VisitCrates(g.Crates)
 	}
 }
 
@@ -511,6 +547,7 @@ type GeneratorRegistriesConfigV2 struct {
 	Pypi     *PypiRegistryConfig     `json:"pypi,omitempty"`
 	Rubygems *RubyGemsRegistryConfig `json:"rubygems,omitempty"`
 	Nuget    *NugetRegistryConfig    `json:"nuget,omitempty"`
+	Crates   *CratesRegistryConfig   `json:"crates,omitempty"`
 }
 
 type GithubOutputMode struct {
@@ -531,6 +568,7 @@ type GithubPublishInfo struct {
 	Pypi     *PypiGithubPublishInfo
 	Rubygems *RubyGemsGithubPublishInfo
 	Nuget    *NugetGithubPublishInfo
+	Crates   *CratesGithubPublishInfo
 }
 
 func NewGithubPublishInfoFromNpm(value *NpmGithubPublishInfo) *GithubPublishInfo {
@@ -555,6 +593,10 @@ func NewGithubPublishInfoFromRubygems(value *RubyGemsGithubPublishInfo) *GithubP
 
 func NewGithubPublishInfoFromNuget(value *NugetGithubPublishInfo) *GithubPublishInfo {
 	return &GithubPublishInfo{Type: "nuget", Nuget: value}
+}
+
+func NewGithubPublishInfoFromCrates(value *CratesGithubPublishInfo) *GithubPublishInfo {
+	return &GithubPublishInfo{Type: "crates", Crates: value}
 }
 
 func (g *GithubPublishInfo) UnmarshalJSON(data []byte) error {
@@ -602,6 +644,12 @@ func (g *GithubPublishInfo) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		g.Nuget = value
+	case "crates":
+		value := new(CratesGithubPublishInfo)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		g.Crates = value
 	}
 	return nil
 }
@@ -664,6 +712,15 @@ func (g GithubPublishInfo) MarshalJSON() ([]byte, error) {
 			NugetGithubPublishInfo: g.Nuget,
 		}
 		return json.Marshal(marshaler)
+	case "crates":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*CratesGithubPublishInfo
+		}{
+			Type:                    g.Type,
+			CratesGithubPublishInfo: g.Crates,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -674,6 +731,7 @@ type GithubPublishInfoVisitor interface {
 	VisitPypi(*PypiGithubPublishInfo) error
 	VisitRubygems(*RubyGemsGithubPublishInfo) error
 	VisitNuget(*NugetGithubPublishInfo) error
+	VisitCrates(*CratesGithubPublishInfo) error
 }
 
 func (g *GithubPublishInfo) Accept(visitor GithubPublishInfoVisitor) error {
@@ -692,6 +750,8 @@ func (g *GithubPublishInfo) Accept(visitor GithubPublishInfoVisitor) error {
 		return visitor.VisitRubygems(g.Rubygems)
 	case "nuget":
 		return visitor.VisitNuget(g.Nuget)
+	case "crates":
+		return visitor.VisitCrates(g.Crates)
 	}
 }
 
@@ -1057,6 +1117,11 @@ type RubyGemsRegistryConfig struct {
 	PackageName string `json:"packageName"`
 }
 
+type CratesCoordinate struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+}
+
 type ErrorExitStatusUpdate struct {
 	Message string `json:"message"`
 }
@@ -1216,9 +1281,10 @@ type NpmCoordinate struct {
 }
 
 type PackageCoordinate struct {
-	Type  string
-	Npm   *NpmCoordinate
-	Maven *MavenCoordinate
+	Type   string
+	Npm    *NpmCoordinate
+	Maven  *MavenCoordinate
+	Crates *CratesCoordinate
 }
 
 func NewPackageCoordinateFromNpm(value *NpmCoordinate) *PackageCoordinate {
@@ -1227,6 +1293,10 @@ func NewPackageCoordinateFromNpm(value *NpmCoordinate) *PackageCoordinate {
 
 func NewPackageCoordinateFromMaven(value *MavenCoordinate) *PackageCoordinate {
 	return &PackageCoordinate{Type: "maven", Maven: value}
+}
+
+func NewPackageCoordinateFromCrates(value *CratesCoordinate) *PackageCoordinate {
+	return &PackageCoordinate{Type: "crates", Crates: value}
 }
 
 func (p *PackageCoordinate) UnmarshalJSON(data []byte) error {
@@ -1250,6 +1320,12 @@ func (p *PackageCoordinate) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		p.Maven = value
+	case "crates":
+		value := new(CratesCoordinate)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		p.Crates = value
 	}
 	return nil
 }
@@ -1276,12 +1352,22 @@ func (p PackageCoordinate) MarshalJSON() ([]byte, error) {
 			MavenCoordinate: p.Maven,
 		}
 		return json.Marshal(marshaler)
+	case "crates":
+		var marshaler = struct {
+			Type string `json:"_type"`
+			*CratesCoordinate
+		}{
+			Type:             p.Type,
+			CratesCoordinate: p.Crates,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
 type PackageCoordinateVisitor interface {
 	VisitNpm(*NpmCoordinate) error
 	VisitMaven(*MavenCoordinate) error
+	VisitCrates(*CratesCoordinate) error
 }
 
 func (p *PackageCoordinate) Accept(visitor PackageCoordinateVisitor) error {
@@ -1292,6 +1378,8 @@ func (p *PackageCoordinate) Accept(visitor PackageCoordinateVisitor) error {
 		return visitor.VisitNpm(p.Npm)
 	case "maven":
 		return visitor.VisitMaven(p.Maven)
+	case "crates":
+		return visitor.VisitCrates(p.Crates)
 	}
 }
 
@@ -1303,6 +1391,7 @@ const (
 	RegistryTypePypi
 	RegistryTypeRubygems
 	RegistryTypeNuget
+	RegistryTypeCrates
 )
 
 func (r RegistryType) String() string {
@@ -1319,6 +1408,8 @@ func (r RegistryType) String() string {
 		return "RUBYGEMS"
 	case RegistryTypeNuget:
 		return "NUGET"
+	case RegistryTypeCrates:
+		return "CRATES"
 	}
 }
 
@@ -1347,6 +1438,9 @@ func (r *RegistryType) UnmarshalJSON(data []byte) error {
 	case "NUGET":
 		value := RegistryTypeNuget
 		*r = value
+	case "CRATES":
+		value := RegistryTypeCrates
+		*r = value
 	}
 	return nil
 }
@@ -1366,6 +1460,7 @@ const (
 	BadgeTypeGo
 	BadgeTypeRubygems
 	BadgeTypeNuget
+	BadgeTypeCrates
 )
 
 func (b BadgeType) String() string {
@@ -1384,6 +1479,8 @@ func (b BadgeType) String() string {
 		return "RUBYGEMS"
 	case BadgeTypeNuget:
 		return "NUGET"
+	case BadgeTypeCrates:
+		return "CRATES"
 	}
 }
 
@@ -1414,6 +1511,9 @@ func (b *BadgeType) UnmarshalJSON(data []byte) error {
 		*b = value
 	case "NUGET":
 		value := BadgeTypeNuget
+		*b = value
+	case "CRATES":
+		value := BadgeTypeCrates
 		*b = value
 	}
 	return nil
@@ -1523,6 +1623,7 @@ type EndpointSnippet struct {
 	Go         *GoEndpointSnippet
 	Ruby       *RubyEndpointSnippet
 	Csharp     *CsharpEndpointSnippet
+	Rust       *RustEndpointSnippet
 }
 
 func NewEndpointSnippetFromTypescript(value *TypescriptEndpointSnippet) *EndpointSnippet {
@@ -1547,6 +1648,10 @@ func NewEndpointSnippetFromRuby(value *RubyEndpointSnippet) *EndpointSnippet {
 
 func NewEndpointSnippetFromCsharp(value *CsharpEndpointSnippet) *EndpointSnippet {
 	return &EndpointSnippet{Type: "csharp", Csharp: value}
+}
+
+func NewEndpointSnippetFromRust(value *RustEndpointSnippet) *EndpointSnippet {
+	return &EndpointSnippet{Type: "rust", Rust: value}
 }
 
 func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
@@ -1594,6 +1699,12 @@ func (e *EndpointSnippet) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		e.Csharp = value
+	case "rust":
+		value := new(RustEndpointSnippet)
+		if err := json.Unmarshal(data, &value); err != nil {
+			return err
+		}
+		e.Rust = value
 	}
 	return nil
 }
@@ -1656,6 +1767,15 @@ func (e EndpointSnippet) MarshalJSON() ([]byte, error) {
 			CsharpEndpointSnippet: e.Csharp,
 		}
 		return json.Marshal(marshaler)
+	case "rust":
+		var marshaler = struct {
+			Type string `json:"type"`
+			*RustEndpointSnippet
+		}{
+			Type:                e.Type,
+			RustEndpointSnippet: e.Rust,
+		}
+		return json.Marshal(marshaler)
 	}
 }
 
@@ -1666,6 +1786,7 @@ type EndpointSnippetVisitor interface {
 	VisitGo(*GoEndpointSnippet) error
 	VisitRuby(*RubyEndpointSnippet) error
 	VisitCsharp(*CsharpEndpointSnippet) error
+	VisitRust(*RustEndpointSnippet) error
 }
 
 func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
@@ -1684,6 +1805,8 @@ func (e *EndpointSnippet) Accept(visitor EndpointSnippetVisitor) error {
 		return visitor.VisitRuby(e.Ruby)
 	case "csharp":
 		return visitor.VisitCsharp(e.Csharp)
+	case "rust":
+		return visitor.VisitRust(e.Rust)
 	}
 }
 
@@ -1781,6 +1904,19 @@ type RubyEndpointSnippet struct {
 	// submission_id: "submission-12o3uds",
 	// request: Acme::RunningSubmissionState::QUEUEING_SUBMISSION
 	// )
+	Client string `json:"client"`
+}
+
+type RustEndpointSnippet struct {
+	// A full endpoint snippet, including the client instantiation, e.g.
+	//
+	// use acme::{AcmeClient, RunningSubmissionState};
+	//
+	// let client = AcmeClient::new("YOUR_API_KEY");
+	// client.admin().update(
+	// "submission-12o3uds",
+	// RunningSubmissionState::QueueingSubmission,
+	// ).await?;
 	Client string `json:"client"`
 }
 
