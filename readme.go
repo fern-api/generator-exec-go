@@ -2,10 +2,83 @@
 
 package generatorexec
 
+import (
+	json "encoding/json"
+	fmt "fmt"
+	strconv "strconv"
+)
+
+type BadgeType uint
+
+const (
+	BadgeTypeNpm BadgeType = iota + 1
+	BadgeTypeMaven
+	BadgeTypePypi
+	BadgeTypeGo
+	BadgeTypeRubygems
+	BadgeTypeNuget
+	BadgeTypeCrates
+)
+
+func (b BadgeType) String() string {
+	switch b {
+	default:
+		return strconv.Itoa(int(b))
+	case BadgeTypeNpm:
+		return "NPM"
+	case BadgeTypeMaven:
+		return "MAVEN"
+	case BadgeTypePypi:
+		return "PYPI"
+	case BadgeTypeGo:
+		return "GO"
+	case BadgeTypeRubygems:
+		return "RUBYGEMS"
+	case BadgeTypeNuget:
+		return "NUGET"
+	case BadgeTypeCrates:
+		return "CRATES"
+	}
+}
+
+func (b BadgeType) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%q", b.String())), nil
+}
+
+func (b *BadgeType) UnmarshalJSON(data []byte) error {
+	var raw string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch raw {
+	case "NPM":
+		value := BadgeTypeNpm
+		*b = value
+	case "MAVEN":
+		value := BadgeTypeMaven
+		*b = value
+	case "PYPI":
+		value := BadgeTypePypi
+		*b = value
+	case "GO":
+		value := BadgeTypeGo
+		*b = value
+	case "RUBYGEMS":
+		value := BadgeTypeRubygems
+		*b = value
+	case "NUGET":
+		value := BadgeTypeNuget
+		*b = value
+	case "CRATES":
+		value := BadgeTypeCrates
+		*b = value
+	}
+	return nil
+}
+
 // The standard sections included in every generated README.md
 //
 // # {{title}}
-//
 // {{badge}} [Fern Badge]
 //
 // {{summary}}

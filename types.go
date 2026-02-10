@@ -1117,407 +1117,7 @@ type RubyGemsRegistryConfig struct {
 	PackageName string `json:"packageName"`
 }
 
-type CratesCoordinate struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-}
-
-type ErrorExitStatusUpdate struct {
-	Message string `json:"message"`
-}
-
-type ExitStatusUpdate struct {
-	Type       string
-	Successful *SuccessfulStatusUpdate
-	Error      *ErrorExitStatusUpdate
-}
-
-func NewExitStatusUpdateFromSuccessful(value *SuccessfulStatusUpdate) *ExitStatusUpdate {
-	return &ExitStatusUpdate{Type: "successful", Successful: value}
-}
-
-func NewExitStatusUpdateFromError(value *ErrorExitStatusUpdate) *ExitStatusUpdate {
-	return &ExitStatusUpdate{Type: "error", Error: value}
-}
-
-func (e *ExitStatusUpdate) UnmarshalJSON(data []byte) error {
-	var unmarshaler struct {
-		Type string `json:"_type"`
-	}
-	if err := json.Unmarshal(data, &unmarshaler); err != nil {
-		return err
-	}
-	e.Type = unmarshaler.Type
-	switch unmarshaler.Type {
-	case "successful":
-		value := new(SuccessfulStatusUpdate)
-		if err := json.Unmarshal(data, &value); err != nil {
-			return err
-		}
-		e.Successful = value
-	case "error":
-		value := new(ErrorExitStatusUpdate)
-		if err := json.Unmarshal(data, &value); err != nil {
-			return err
-		}
-		e.Error = value
-	}
-	return nil
-}
-
-func (e ExitStatusUpdate) MarshalJSON() ([]byte, error) {
-	switch e.Type {
-	default:
-		return nil, fmt.Errorf("invalid type %s in %T", e.Type, e)
-	case "successful":
-		var marshaler = struct {
-			Type string `json:"_type"`
-			*SuccessfulStatusUpdate
-		}{
-			Type:                   e.Type,
-			SuccessfulStatusUpdate: e.Successful,
-		}
-		return json.Marshal(marshaler)
-	case "error":
-		var marshaler = struct {
-			Type string `json:"_type"`
-			*ErrorExitStatusUpdate
-		}{
-			Type:                  e.Type,
-			ErrorExitStatusUpdate: e.Error,
-		}
-		return json.Marshal(marshaler)
-	}
-}
-
-type ExitStatusUpdateVisitor interface {
-	VisitSuccessful(*SuccessfulStatusUpdate) error
-	VisitError(*ErrorExitStatusUpdate) error
-}
-
-func (e *ExitStatusUpdate) Accept(visitor ExitStatusUpdateVisitor) error {
-	switch e.Type {
-	default:
-		return fmt.Errorf("invalid type %s in %T", e.Type, e)
-	case "successful":
-		return visitor.VisitSuccessful(e.Successful)
-	case "error":
-		return visitor.VisitError(e.Error)
-	}
-}
-
-type InitUpdate struct {
-	PackagesToPublish []*PackageCoordinate `json:"packagesToPublish,omitempty"`
-}
-
-type InitUpdateV2 struct {
-	PublishingToRegistry *RegistryType `json:"publishingToRegistry,omitempty"`
-}
-
-type LogLevel uint
-
-const (
-	LogLevelDebug LogLevel = iota + 1
-	LogLevelInfo
-	LogLevelWarn
-	LogLevelError
-)
-
-func (l LogLevel) String() string {
-	switch l {
-	default:
-		return strconv.Itoa(int(l))
-	case LogLevelDebug:
-		return "DEBUG"
-	case LogLevelInfo:
-		return "INFO"
-	case LogLevelWarn:
-		return "WARN"
-	case LogLevelError:
-		return "ERROR"
-	}
-}
-
-func (l LogLevel) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", l.String())), nil
-}
-
-func (l *LogLevel) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "DEBUG":
-		value := LogLevelDebug
-		*l = value
-	case "INFO":
-		value := LogLevelInfo
-		*l = value
-	case "WARN":
-		value := LogLevelWarn
-		*l = value
-	case "ERROR":
-		value := LogLevelError
-		*l = value
-	}
-	return nil
-}
-
-type LogUpdate struct {
-	Level   LogLevel `json:"level,omitempty"`
-	Message string   `json:"message"`
-}
-
-type MavenCoordinate struct {
-	Group    string `json:"group"`
-	Artifact string `json:"artifact"`
-	Version  string `json:"version"`
-}
-
-type NpmCoordinate struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-}
-
-type PackageCoordinate struct {
-	Type   string
-	Npm    *NpmCoordinate
-	Maven  *MavenCoordinate
-	Crates *CratesCoordinate
-}
-
-func NewPackageCoordinateFromNpm(value *NpmCoordinate) *PackageCoordinate {
-	return &PackageCoordinate{Type: "npm", Npm: value}
-}
-
-func NewPackageCoordinateFromMaven(value *MavenCoordinate) *PackageCoordinate {
-	return &PackageCoordinate{Type: "maven", Maven: value}
-}
-
-func NewPackageCoordinateFromCrates(value *CratesCoordinate) *PackageCoordinate {
-	return &PackageCoordinate{Type: "crates", Crates: value}
-}
-
-func (p *PackageCoordinate) UnmarshalJSON(data []byte) error {
-	var unmarshaler struct {
-		Type string `json:"_type"`
-	}
-	if err := json.Unmarshal(data, &unmarshaler); err != nil {
-		return err
-	}
-	p.Type = unmarshaler.Type
-	switch unmarshaler.Type {
-	case "npm":
-		value := new(NpmCoordinate)
-		if err := json.Unmarshal(data, &value); err != nil {
-			return err
-		}
-		p.Npm = value
-	case "maven":
-		value := new(MavenCoordinate)
-		if err := json.Unmarshal(data, &value); err != nil {
-			return err
-		}
-		p.Maven = value
-	case "crates":
-		value := new(CratesCoordinate)
-		if err := json.Unmarshal(data, &value); err != nil {
-			return err
-		}
-		p.Crates = value
-	}
-	return nil
-}
-
-func (p PackageCoordinate) MarshalJSON() ([]byte, error) {
-	switch p.Type {
-	default:
-		return nil, fmt.Errorf("invalid type %s in %T", p.Type, p)
-	case "npm":
-		var marshaler = struct {
-			Type string `json:"_type"`
-			*NpmCoordinate
-		}{
-			Type:          p.Type,
-			NpmCoordinate: p.Npm,
-		}
-		return json.Marshal(marshaler)
-	case "maven":
-		var marshaler = struct {
-			Type string `json:"_type"`
-			*MavenCoordinate
-		}{
-			Type:            p.Type,
-			MavenCoordinate: p.Maven,
-		}
-		return json.Marshal(marshaler)
-	case "crates":
-		var marshaler = struct {
-			Type string `json:"_type"`
-			*CratesCoordinate
-		}{
-			Type:             p.Type,
-			CratesCoordinate: p.Crates,
-		}
-		return json.Marshal(marshaler)
-	}
-}
-
-type PackageCoordinateVisitor interface {
-	VisitNpm(*NpmCoordinate) error
-	VisitMaven(*MavenCoordinate) error
-	VisitCrates(*CratesCoordinate) error
-}
-
-func (p *PackageCoordinate) Accept(visitor PackageCoordinateVisitor) error {
-	switch p.Type {
-	default:
-		return fmt.Errorf("invalid type %s in %T", p.Type, p)
-	case "npm":
-		return visitor.VisitNpm(p.Npm)
-	case "maven":
-		return visitor.VisitMaven(p.Maven)
-	case "crates":
-		return visitor.VisitCrates(p.Crates)
-	}
-}
-
-type RegistryType uint
-
-const (
-	RegistryTypeNpm RegistryType = iota + 1
-	RegistryTypeMaven
-	RegistryTypePypi
-	RegistryTypeRubygems
-	RegistryTypeNuget
-	RegistryTypeCrates
-)
-
-func (r RegistryType) String() string {
-	switch r {
-	default:
-		return strconv.Itoa(int(r))
-	case RegistryTypeNpm:
-		return "NPM"
-	case RegistryTypeMaven:
-		return "MAVEN"
-	case RegistryTypePypi:
-		return "PYPI"
-	case RegistryTypeRubygems:
-		return "RUBYGEMS"
-	case RegistryTypeNuget:
-		return "NUGET"
-	case RegistryTypeCrates:
-		return "CRATES"
-	}
-}
-
-func (r RegistryType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", r.String())), nil
-}
-
-func (r *RegistryType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "NPM":
-		value := RegistryTypeNpm
-		*r = value
-	case "MAVEN":
-		value := RegistryTypeMaven
-		*r = value
-	case "PYPI":
-		value := RegistryTypePypi
-		*r = value
-	case "RUBYGEMS":
-		value := RegistryTypeRubygems
-		*r = value
-	case "NUGET":
-		value := RegistryTypeNuget
-		*r = value
-	case "CRATES":
-		value := RegistryTypeCrates
-		*r = value
-	}
-	return nil
-}
-
-type SuccessfulStatusUpdate struct {
-	ZipFilename *string `json:"zipFilename,omitempty"`
-}
-
 type TaskId = string
-
-type BadgeType uint
-
-const (
-	BadgeTypeNpm BadgeType = iota + 1
-	BadgeTypeMaven
-	BadgeTypePypi
-	BadgeTypeGo
-	BadgeTypeRubygems
-	BadgeTypeNuget
-	BadgeTypeCrates
-)
-
-func (b BadgeType) String() string {
-	switch b {
-	default:
-		return strconv.Itoa(int(b))
-	case BadgeTypeNpm:
-		return "NPM"
-	case BadgeTypeMaven:
-		return "MAVEN"
-	case BadgeTypePypi:
-		return "PYPI"
-	case BadgeTypeGo:
-		return "GO"
-	case BadgeTypeRubygems:
-		return "RUBYGEMS"
-	case BadgeTypeNuget:
-		return "NUGET"
-	case BadgeTypeCrates:
-		return "CRATES"
-	}
-}
-
-func (b BadgeType) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", b.String())), nil
-}
-
-func (b *BadgeType) UnmarshalJSON(data []byte) error {
-	var raw string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	switch raw {
-	case "NPM":
-		value := BadgeTypeNpm
-		*b = value
-	case "MAVEN":
-		value := BadgeTypeMaven
-		*b = value
-	case "PYPI":
-		value := BadgeTypePypi
-		*b = value
-	case "GO":
-		value := BadgeTypeGo
-		*b = value
-	case "RUBYGEMS":
-		value := BadgeTypeRubygems
-		*b = value
-	case "NUGET":
-		value := BadgeTypeNuget
-		*b = value
-	case "CRATES":
-		value := BadgeTypeCrates
-		*b = value
-	}
-	return nil
-}
 
 type CsharpEndpointSnippet struct {
 	// A full endpoint snippet, including the client instantiation, e.g.
@@ -1526,10 +1126,11 @@ type CsharpEndpointSnippet struct {
 	//
 	// var acme = new AcmeClient("<YOUR_API_KEY>");
 	// await acme.Admin.Update(new UpdateAdminRequest
-	// {
-	// Id = "submission-12o3uds",
-	// SubmissionState = RunningSubmissionState.QueueingSubmission,
-	// });
+	//
+	//	{
+	//	  Id = "submission-12o3uds",
+	//	  SubmissionState = RunningSubmissionState.QueueingSubmission,
+	//	});
 	Client string `json:"client"`
 }
 
@@ -1814,22 +1415,28 @@ type GoEndpointSnippet struct {
 	// A full endpoint snippet, including the client instantiation, e.g.
 	//
 	// import (
-	// "context"
-	// "fmt"
 	//
-	// acme "github.com/acme/acme-go"
-	// acmeclient "github.com/acme/acme-go/client"
+	//	"context"
+	//	"fmt"
+	//
+	//	acme "github.com/acme/acme-go"
+	//	acmeclient "github.com/acme/acme-go/client"
+	//
 	// )
 	//
 	// client := acmeclient.NewClient(
-	// acmeclient.WithApiKey("..."),
+	//
+	//	acmeclient.WithApiKey("..."),
+	//
 	// )
 	// client.Admin.Update(
-	// context.TODO(),
-	// "submission-12o3uds",
-	// &acme.AdminUpdateRequest{
-	// SubmissionState: acme.RunningSubmissionStateQueuingSubmission,
-	// },
+	//
+	//	context.TODO(),
+	//	"submission-12o3uds",
+	//	&acme.AdminUpdateRequest{
+	//	  SubmissionState: acme.RunningSubmissionStateQueuingSubmission,
+	//	},
+	//
 	// )
 	Client string `json:"client"`
 }
@@ -1841,14 +1448,16 @@ type JavaEndpointSnippet struct {
 	// import com.acme.resources.types.RunningSubmissionState;
 	//
 	// AcmeClient acmeClient = AcmeClient.builder()
-	// .apiKey("...")
-	// .build();
+	//
+	//	.apiKey("...")
+	//	.build();
 	//
 	// acmeClient.admin().create(
-	// "submission-12o3uds",
-	// AdminUpdateRequest.builder()
-	// .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
-	// .build());
+	//
+	//	"submission-12o3uds",
+	//	AdminUpdateRequest.builder()
+	//	  .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
+	//	  .build());
 	SyncClient string `json:"sync_client"`
 	// A full endpoint snippet, including the async client instantiation, e.g.
 	//
@@ -1856,14 +1465,16 @@ type JavaEndpointSnippet struct {
 	// import com.acme.resources.types.RunningSubmissionState;
 	//
 	// AcmeClient acmeClient = AcmeClient.builder()
-	// .apiKey("API_KEY")
-	// .build();
+	//
+	//	.apiKey("API_KEY")
+	//	.build();
 	//
 	// acmeClient.admin().create(
-	// "submission-12o3uds",
-	// AdminUpdateRequest.builder()
-	// .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
-	// .build());
+	//
+	//	"submission-12o3uds",
+	//	AdminUpdateRequest.builder()
+	//	  .submissionState(RunningSubmissionState.QUEUEING_SUBMISSION)
+	//	  .build());
 	AsyncClient string `json:"async_client"`
 }
 
@@ -1875,8 +1486,10 @@ type PythonEndpointSnippet struct {
 	//
 	// client = Acme(api_key="...")
 	// client.admin.update(
-	// submission_id="submission-12o3uds",
-	// request=RunningSubmissionState.QUEUEING_SUBMISSION,
+	//
+	//	submission_id="submission-12o3uds",
+	//	request=RunningSubmissionState.QUEUEING_SUBMISSION,
+	//
 	// )
 	SyncClient string `json:"sync_client"`
 	// A full endpoint snippet, including the async client instantiation, e.g.
@@ -1886,8 +1499,10 @@ type PythonEndpointSnippet struct {
 	//
 	// client = AsyncAcme(api_key="...")
 	// await client.admin.update(
-	// submission_id="submission-12o3uds",
-	// request=RunningSubmissionState.QUEUEING_SUBMISSION,
+	//
+	//	submission_id="submission-12o3uds",
+	//	request=RunningSubmissionState.QUEUEING_SUBMISSION,
+	//
 	// )
 	AsyncClient string `json:"async_client"`
 }
@@ -1898,11 +1513,15 @@ type RubyEndpointSnippet struct {
 	// require "acme"
 	//
 	// acme = Acme::Client.new(
-	// apiKey: 'YOUR_API_KEY'
+	//
+	//	apiKey: 'YOUR_API_KEY'
+	//
 	// )
 	// acme.admin.update(
-	// submission_id: "submission-12o3uds",
-	// request: Acme::RunningSubmissionState::QUEUEING_SUBMISSION
+	//
+	//	submission_id: "submission-12o3uds",
+	//	request: Acme::RunningSubmissionState::QUEUEING_SUBMISSION
+	//
 	// )
 	Client string `json:"client"`
 }
@@ -1914,8 +1533,10 @@ type RustEndpointSnippet struct {
 	//
 	// let client = AcmeClient::new("YOUR_API_KEY");
 	// client.admin().update(
-	// "submission-12o3uds",
-	// RunningSubmissionState::QueueingSubmission,
+	//
+	//	"submission-12o3uds",
+	//	RunningSubmissionState::QueueingSubmission,
+	//
 	// ).await?;
 	Client string `json:"client"`
 }
@@ -1935,12 +1556,13 @@ type TypescriptEndpointSnippet struct {
 	//
 	// import { AcmeClient, Acme } from '@acme/acme-node-client';
 	//
-	// const acme = new AcmeClient({
-	// apiKey: 'YOUR_API_KEY',
-	// });
-	// await acme.admin.update({
-	// submission_id: "submission-12o3uds",
-	// request: Acme.RunningSubmissionState.QUEUEING_SUBMISSION,
-	// });
+	//	const acme = new AcmeClient({
+	//	  apiKey: 'YOUR_API_KEY',
+	//	});
+	//
+	//	await acme.admin.update({
+	//	    submission_id: "submission-12o3uds",
+	//	    request: Acme.RunningSubmissionState.QUEUEING_SUBMISSION,
+	//	});
 	Client string `json:"client"`
 }
