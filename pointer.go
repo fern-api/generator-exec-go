@@ -1,6 +1,15 @@
 package generatorexec
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+// Ptr returns a pointer to the given value.
+func Ptr[T any](v T) *T {
+	return &v
+}
 
 // Bool returns a pointer to the given bool value.
 func Bool(b bool) *bool {
@@ -9,6 +18,11 @@ func Bool(b bool) *bool {
 
 // Byte returns a pointer to the given byte value.
 func Byte(b byte) *byte {
+	return &b
+}
+
+// Bytes returns a pointer to the given []byte value.
+func Bytes(b []byte) *[]byte {
 	return &b
 }
 
@@ -97,7 +111,32 @@ func Uintptr(u uintptr) *uintptr {
 	return &u
 }
 
+// UUID returns a pointer to the given uuid.UUID value.
+func UUID(u uuid.UUID) *uuid.UUID {
+	return &u
+}
+
 // Time returns a pointer to the given time.Time value.
 func Time(t time.Time) *time.Time {
 	return &t
+}
+
+// MustParseDate attempts to parse the given string as a
+// date time.Time, and panics upon failure.
+func MustParseDate(date string) time.Time {
+	t, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// MustParseDateTime attempts to parse the given string as a
+// datetime time.Time, and panics upon failure.
+func MustParseDateTime(datetime string) time.Time {
+	t, err := time.Parse(time.RFC3339, datetime)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

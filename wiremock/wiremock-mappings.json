@@ -1,0 +1,69 @@
+{
+  "mappings": [
+    {
+      "id": "aba177f3-164f-4970-9dfc-9616cfcf263a",
+      "name": "sendUpdate - default",
+      "request": {
+        "urlPathTemplate": "/api/generator-logging/{taskId}",
+        "method": "POST",
+        "pathParameters": {
+          "taskId": {
+            "equalTo": "taskId"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": "\"\"",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "uuid": "aba177f3-164f-4970-9dfc-9616cfcf263a",
+      "persistent": true,
+      "priority": 3,
+      "metadata": {
+        "mocklab": {
+          "created": {
+            "at": "2020-01-01T00:00:00.000Z",
+            "via": "SYSTEM"
+          }
+        }
+      }
+    },
+    {
+      "id": "a13e7348-172f-45f2-99bf-4cc625a24688",
+      "name": "generateReadme - default",
+      "request": {
+        "urlPathTemplate": "/api/readme/{taskId}",
+        "method": "POST",
+        "pathParameters": {
+          "taskId": {
+            "equalTo": "taskId"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": "\"\"",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "uuid": "a13e7348-172f-45f2-99bf-4cc625a24688",
+      "persistent": true,
+      "priority": 3,
+      "metadata": {
+        "mocklab": {
+          "created": {
+            "at": "2020-01-01T00:00:00.000Z",
+            "via": "SYSTEM"
+          }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
